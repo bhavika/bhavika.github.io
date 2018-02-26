@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title> Bhavika Tekwani </title>
+  <meta name="description" content="Personal website, portfolio, bio">
+  <meta name="author" content="Bhavika Tekwani">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Font Awesome Social Icons -->
+  <link rel="stylesheet" href="./font-awesome-4.7.0/css/font-awesome.min.css">
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/bhavikatekwani.css">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="sixteen columns" style="margin-top: 40px">
+        <h1>Bhavika Tekwani</h1>
+        <h5>Technologist, also human.</h5>
+      </div>
+
+     <div class="twenty columns">
+
+      <h5> CS682: Computer Vision (Spring 2018)</h5>
+      <h6> Assignment 2 </h6>
+
+      <a href="http://bhavikatekwani.me/vision_hw2_code.html">Code</a>
+      <a href="HW2_Vision.pdf"> Report </a>
+
+      <table>
+        <tr>
+          <td colspan="2"> # 1.1 Questions 1, 2 and 3  </td>
+          <td> <img src="./vision_output/hw2/op1.jpg" alt="Picture1" width="800" height="800"/>human2.bmp</td>
+          <td><img src="./vision_output/hw2/hist_pic1.png" alt="Hist1" width="800" height="800"/>Histogram</td>
+        </tr>
+
+        <tr>
+          <td colspan="2"> human2.tif</td>
+          <td> <img src="./vision_output/hw2/op2.jpg" alt="Picture2" width="800" height="800"/></td>
+          <td><img src="./vision_output/hw2/hist_pic2.png" alt="Hist2" width="800" height="800"/></td>
+        </tr>
+
+        <tr>
+          <td colspan="2"> human2.ppm </td>
+          <td> <img src="./vision_output/hw2/op3.jpg" alt="Picture3" width="800" height="800"/></td>
+          <td><img src="./vision_output/hw2/hist_pic3.png" alt="Hist3" width="800" height="800"/></td>
+        </tr>
+
+        <tr>
+          <td colspan="2"> image1.jpeg </td>
+          <td> <img src="./vision_output/hw2/op4.jpg" alt="Picture4" width="800" height="800"/></td>
+          <td><img src="./vision_output/hw2/hist_pic4.png" alt="Hist4" width="800" height="800"/></td>
+        </tr>
+
+
+      </table>
+
+        <p>
+          <b> # 1.1 Question 4 </b> </br>
+
+          Consider the following image - image1.jpeg. I have selected 3 windows (shown in green) that can be seen in the second “framed” poster from the left in the image.
+
+          As we can see, the overall colors in that area seem to be mostly white or grey.
+          I select 3 pixels - (147, 232), (158, 251) and (141, 264) which are quite close to each other. Then, I draw windows around them of size 11 * 11. From the calculated RGB values of those pixels, the average mean of RGB is 164 for red, 171 for green and 168 for blue in all 3 windows. Similarly, standard deviation for each channel also does not vary much in those 3 windows. We can say that those 3 windows are homogenous because the variation in mean of the windows is not much. However, if we were to select a window on the desk or bag area, we get drastically different means & standard deviations. Therefore, homogeneity between windows close to each other is greater than that between windows well separated from each other.
+
+          <img src="./vision_output/hw2/op5.jpg" alt="Picture6" />
+          <img src="./vision_output/hw2/op6.jpg" alt="Hist1" width="800" height="600"/>
+
+        </p>
+
+
+        <p>
+          <b> # 1.2 Histogram Intersection & Chi Square Measure </b> </br>
+
+          <img src="./vision_output/hw2/hist_inters.png" alt="Intersection"/>
+          <img src="./vision_output/hw2/hist_chisquare.png" alt="Chi square similarity"/>
+
+        </p>
+
+</body>
+</html>
