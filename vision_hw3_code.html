@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title> Bhavika Tekwani </title>
+  <meta name="description" content="Personal website, portfolio, bio">
+  <meta name="author" content="Bhavika Tekwani">
+
+  <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Font Awesome Social Icons -->
+  <link rel="stylesheet" href="./font-awesome-4.7.0/css/font-awesome.min.css">
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/bhavikatekwani.css">
+
+</head>
+
+<body>
+    <h5> Assignment 3 </h5>
+    <h6> There is one program file - main.py displayed below. </h6>
+    <h5> main.py </h5>
+
+    <pre class="prettyprint">
+                          import os
+                    from time import time
+                    from scipy import misc
+                    import cv2
+                    import numpy as np
+                    from matplotlib import pyplot as plt
+                    import itertools
+                    from collections import defaultdict
+                    import pandas as pd
+
+
+                    def plot(img1, img2, title2=''):
+                    plt.subplot(121)
+                    plt.imshow(img1, cmap='gray')
+                    plt.title('Original Image')
+                    plt.xticks([])
+                    plt.yticks([])
+                    plt.subplot(122)
+                    plt.imshow(img2, cmap='gray')
+                    plt.title(title2)
+                    plt.xticks([])
+                    plt.yticks([])
+                    plt.show()
+
+
+                    def gradient_grey(dir, img):
+                    path = os.path.join(dir, img)
+                    img = cv2.imread(path, 0)
+                    edges = cv2.Canny(img, threshold1=400, threshold2=400)
+
+                    # f = np.array(edges, dtype=np.float)
+                    g = np.gradient(np.array(img))
+                    g_x2 = np.square(g[0])
+                    g_y2 = np.square(g[1])
+                    mag = np.sqrt(g_x2 + g_y2)
+                    mag = np.around(mag, decimals=2)
+                    mag = np.reshape(mag, -1)
+
+                    # plot(img1=img, img2=edges, title2='Grey gradient')
+
+                    angles = np.arctan2(g[1], g[0])
+                    angles = angles*180/4*10
+                    angles = np.around(angles, decimals=2)
+                    angles = np.reshape(angles, -1)
+
+                    h = np.histogram(angles, bins=36, range=[1, 36])
+                    # create_histogram(angles, n_bins=36)
+                    return h
+
+
+                    def create_histogram(img, n_bins):
+                    plt.hist(img, bins=[i for i in range(0, n_bins+1)])
+                    plt.title('Color Edge Histogram')
+                    plt.xlabel('Angles')
+                    plt.ylabel('Frequency')
+                    plt.show()
+
+
+                    def gradient_rgb(dir, img):
+                    path = os.path.join(dir, img)
+                    img = misc.imread(path)
+
+                    b, g, r = cv2.split(img)
+
+                    b_edges = cv2.Canny(b, threshold1=200, threshold2=200)
+                    g_edges = cv2.Canny(g, threshold1=200, threshold2=200)
+                    r_edges = cv2.Canny(r, threshold1=200, threshold2=200)
+
+                    # plot(img1=img, img2=b_edges, title2='Blue Edges')
+                    # plot(img1=img, img2=g_edges, title2='Green Edges')
+                    # plot(img1=img, img2=r_edges, title2='Red Edges')
+
+                    b_gradient = np.gradient(np.array(b))
+                    g_gradient = np.gradient(np.array(g))
+                    r_gradient = np.gradient(np.array(r))
+
+                    # plot(img1=img, img2=b_gradient, title2='Blue Gradient')
+                    # plot(img1=img, img2=g_gradient, title2='Green Gradient')
+                    # plot(img1=img, img2=r_gradient, title2='Red Gradient')
+
+                    magnitude = np.absolute(b_gradient[0]) + np.absolute(b_gradient[1]) + np.absolute(g_gradient[0]) + np.absolute(g_gradient[1]) \
+                            + np.absolute(r_gradient[0]) + np.absolute(r_gradient[1])
+
+                    orientx = b_gradient[0] + g_gradient[0] + r_gradient[0]
+                    orienty = b_gradient[1] + g_gradient[1] + r_gradient[1]
+
+                    angles = np.arctan2(orienty, orientx)
+                    angles = angles*180/4*10
+                    angles = np.around(angles, decimals=2)
+                    angles = np.reshape(angles, -1)
+
+                    h = np.histogram(angles, bins=36, range=[1, 36])
+                    # create_histogram(angles, n_bins=36)
+                    return h
+
+
+                    def hist_intersection(histograms):
+                    combinations = list(map(dict, itertools.combinations(histograms.items(), 2)))
+                    intersections = defaultdict(dict)
+
+                    for c in combinations:
+                    k = c.keys()
+
+                    x = c[k[0]][0]
+                    y = c[k[1]][0]
+
+                    mins = np.minimum(x, y)
+                    maxs = np.maximum(x, y)
+
+                    try:
+                        intersections[k[0]][k[1]] = float(np.sum(mins))/np.sum(maxs)
+                    except ZeroDivisionError:
+                        intersections[k[0]][k[1]] = 0
+
+                    for k, v in intersections.items():
+                    intersections[k][k] = 1.0
+
+                    return intersections
+
+
+                    def chisq_measure(histograms):
+                    combinations = list(map(dict, itertools.combinations(histograms.items(), 2)))
+
+                    chsq = defaultdict(dict)
+
+                    for c in combinations:
+                    k = c.keys()
+                    x = c[k[0]][0]
+                    y = c[k[1]][0]
+
+                    diff = np.subtract(x, y)
+                    denom = np.add(x, y)
+                    diff = np.apply_along_axis(lambda x: x ** 2, 0, diff)
+
+                    diff = diff[denom != 0]
+                    denom = denom[denom != 0]
+
+                    divs = np.divide(diff, denom)
+
+                    chsq[k[0]][k[1]] = np.sum(divs)
+
+                    for k, v in chsq.items():
+                    chsq[k][k] = 0
+
+                    return chsq
+
+
+                    def adjust_dictionaries(ddict):
+                    for k, v in ddict.items():
+                    for i, j in v.items():
+                        ddict[i][k] = j
+                    return ddict
+
+
+                    def visualize(df, title, ticks):
+                    import matplotlib.pyplot as plt
+                    from matplotlib import cm as cm
+
+                    fig = plt.figure()
+                    ax1 = fig.add_subplot(111)
+                    cmap = cm.get_cmap('gray', 30)
+                    cax = ax1.imshow(df, interpolation=None, cmap=cmap)
+                    ax1.grid(True)
+                    plt.title(title)
+                    labels = [x for x in range(6)]
+                    ax1.set_xticklabels(labels, fontsize=11)
+                    ax1.set_yticklabels(labels, fontsize=11)
+                    # Add colorbar, make sure to specify tick locations to match desired ticklabels
+                    fig.colorbar(cax, ticks=ticks)
+                    plt.show()
+
+
+                    if __name__ == '__main__':
+                    dir = './images/ST2MainHall4'
+                    images = os.listdir(dir)
+
+                    gray_hists = {}
+                    color_hists = {}
+
+                    start_time = time()
+
+                    for i in images:
+                    fname = i[-8:-4]
+                    print(fname)
+                    g = gradient_grey(dir, i)
+                    gray_hists[fname] = g
+                    h = gradient_rgb(dir, i)
+                    color_hists[fname] = h
+
+                    # Color Edges - intersection and chisquare
+
+                    color_intersections = hist_intersection(color_hists)
+                    color_chsq = chisq_measure(color_hists)
+
+                    color_i_dict = adjust_dictionaries(color_intersections)
+                    color_chsq_dict = adjust_dictionaries(color_chsq)
+
+                    colori = pd.DataFrame.from_dict(color_i_dict, orient='columns')
+                    colorchi = pd.DataFrame.from_dict(color_chsq_dict, orient='columns')
+
+                    color_imax = colori.max().max()
+                    color_cmax = colorchi.max().max()
+
+                    color_iticks = np.linspace(0, color_imax, 6)[1:]
+                    color_cticks = np.linspace(0, color_cmax, 6)[1:]
+
+                    visualize(colori, title='Intersection - Color Edges', ticks=color_iticks)
+                    visualize(colorchi, title='Chi-square measure - Color Edges', ticks=color_cticks)
+
+                    # Gray intersections and chisquare
+
+                    grey_intersections = hist_intersection(gray_hists)
+                    gray_chsq = chisq_measure(gray_hists)
+
+                    grey_i_dict = adjust_dictionaries(grey_intersections)
+                    grey_chsq_dict = adjust_dictionaries(gray_chsq)
+
+                    grayi = pd.DataFrame.from_dict(grey_i_dict, orient='columns')
+                    grayc = pd.DataFrame.from_dict(grey_chsq_dict, orient='columns')
+
+                    i_max = grayi.max().max()
+                    c_max = grayc.max().max()
+
+                    i_ticks = np.linspace(0, i_max, 6)[1:]
+                    c_ticks = np.linspace(0, c_max, 6)[1:]
+
+                    visualize(grayi, title='Intersection - Gray Edges', ticks=i_ticks)
+                    visualize(grayc, title='Chi-square measure - Gray Edges', ticks=c_ticks)
+    </pre>
+
+
+</body>
