@@ -23,7 +23,7 @@
 
 <body>
     <h5> Assignment 3 </h5>
-    <h6> There is one program file - main.py displayed below. </h6>
+    <h6> There are 2 program files - main.py and heatmap.py displayed below. </h6>
     <h5> main.py </h5>
 
     <pre class="prettyprint">
@@ -257,5 +257,64 @@
                     visualize(grayc, title='Chi-square measure - Gray Edges', ticks=c_ticks)
     </pre>
 
+    <h5> heatmap.py </h5>
+    <pre>
+          import os
+          from scipy import misc
+          import cv2
+          import numpy as np
+          import matplotlib.pyplot as plt
+
+
+          def gradient_rgb(dir, img):
+            path = os.path.join(dir, img)
+            img = misc.imread(path)
+
+            b, g, r = cv2.split(img)
+
+            b_edges = cv2.Canny(b, threshold1=200, threshold2=200)
+            g_edges = cv2.Canny(g, threshold1=200, threshold2=200)
+            r_edges = cv2.Canny(r, threshold1=200, threshold2=200)
+
+            b_gradient = np.gradient(np.array(b_edges))
+            g_gradient = np.gradient(np.array(g_edges))
+            r_gradient = np.gradient(np.array(r_edges))
+
+            magnitude = np.absolute(b_gradient[0]) + np.absolute(b_gradient[1]) + np.absolute(g_gradient[0]) + np.absolute(g_gradient[1]) \
+                        + np.absolute(r_gradient[0]) + np.absolute(r_gradient[1])
+
+            orientx = b_gradient[0] + g_gradient[0] + r_gradient[0]
+            orienty = b_gradient[1] + g_gradient[1] + r_gradient[1]
+
+            angles = np.arctan2(orienty, orientx)
+            angles = angles*180/4*10
+            angles = np.around(angles, decimals=2)
+
+            return img, magnitude, angles
+
+
+          def heatmap(img, magnitude, angles):
+            plt.subplot(131)
+            plt.imshow(img, cmap='hot', interpolation='nearest')
+            plt.title('Original Image')
+            plt.xticks([])
+            plt.yticks([])
+            plt.subplot(132)
+            plt.imshow(magnitude, cmap='hot', interpolation='nearest')
+            plt.title('Magnitude')
+            plt.xticks([])
+            plt.yticks([])
+            plt.subplot(133)
+            plt.imshow(angles, cmap='hot', interpolation='nearest')
+            plt.title('Angles')
+            plt.xticks([])
+            plt.yticks([])
+            plt.show()
+
+
+          dir = './images/ST2MainHall4'
+          img, m, a = gradient_rgb(dir, 'ST2MainHall4027.jpg')
+          heatmap(img, m, a)
+    </pre>
 
 </body>
