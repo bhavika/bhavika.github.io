@@ -25,7 +25,7 @@
     <h5> Assignment 4 </h5>
     <h6> There are 4 program files - part1_2.py, part3.py, part4.py, part5.py displayed below.</h6>
     <h6> An optional implementation of Squared Euclidean Distance Transform (SEDT) is in sedt.py </h6>
-    <h5> part1_2.py </h5>
+    <h5> part1_2.py - Feature Extraction </h5>
 
     <pre class="prettyprint">
                 import cv2
@@ -254,7 +254,7 @@
                 main()
     </pre>
 
-    <h5> part3.py </h5>
+    <h5> part3.py - Curvature Calculations </h5>
     <pre>
           import cv2
           import numpy as np
@@ -377,7 +377,7 @@
               create_viz(f)
     </pre>
 
-    <h5> part4.py </h5>
+    <h5> part4.py - Distance Transform </h5>
     <pre>
       import cv2
       import glob
@@ -403,9 +403,71 @@
             plt.clf()
     </pre>
 
-    <h5> part5.py </h5>
+    <h5> part5.py - Chamfer Matching </h5>
     <pre>
+          import cv2
+          import glob
+          import numpy as np
+          from itertools import chain
 
+
+          def match(image, template):
+            img = image.tolist()
+            temp = template.tolist()
+
+            # flattening all numpy arrays - easier to manage lists
+            img = list(chain(*img))
+            temp = list(chain(*temp))
+
+            sum = 0
+            for i in range(len(temp)):
+                if temp[i] == 1:
+                    sum += img[i]
+            return sum
+
+
+          def chamfer_matching(images):
+            B = []
+            dt = []
+            for i in images:
+                img = cv2.imread(i, 0)
+                ret, thresh_img = cv2.threshold(img, 1, 1, cv2.THRESH_BINARY)
+                dst = cv2.distanceTransform(thresh_img, distanceType=cv2.DIST_L2, maskSize=cv2.DIST_MASK_3)
+                B.append(thresh_img)
+                dt.append(dst)
+
+            match_score = np.zeros((len(B), len(B)))
+            size = len(B)
+
+            for a in range(size):
+                for b in range(size):
+                    image = dt[a].astype(np.uint8)
+                    template = B[b].astype(np.uint8)
+                    # print("Image: {}, template: {}".format(a, b))
+                    y = match(image, template)
+                    match_score[a, b] = y
+            return match_score
+
+
+          def visualize(arr):
+            import matplotlib.pyplot as plt
+            from matplotlib import cm as cm
+
+            fig = plt.figure()
+            ax1 = fig.add_subplot(111)
+            cmap = cm.get_cmap('gray', 30)
+            cax = ax1.imshow(arr, interpolation=None, cmap=cmap)
+            ax1.grid(True)
+            plt.title('Chamfer Matching - Scores')
+            plt.show()
+
+          if __name__ == '__main__':
+            filenames = [img for img in glob.glob("GaitImages/*.png")]
+            filenames.sort()
+
+            match_score = chamfer_matching(filenames)
+
+            visualize(match_score)
 
     </pre>
 
