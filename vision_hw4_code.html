@@ -262,119 +262,137 @@
           import matplotlib.pyplot as plt
           from scipy.signal import argrelextrema
 
-
           # contours is a list of lists of numpy arrays
           def get_contours(i):
-          img = cv2.imread(i)
-          h, w = img.shape[:2]
-          img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-          _, contours, hierarchy = cv2.findContours(img.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-          return contours
+            img = cv2.imread(i)
+            h, w = img.shape[:2]
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            _, contours, hierarchy = cv2.findContours(img.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+            return contours
 
 
           # calculates the curvature at each point of the contour
           def curvature(contour, k=3):
-          c = [0] * len(contour)
+            c = [0] * len(contour)
 
-          for i in range(len(contour)):
-              pts = i + k
-              if pts >= len(contour):
-                  diff = len(contour) - pts
-                  pts -= diff
+            for i in range(len(contour)):
+                pts = i + k
+                if pts >= len(contour):
+                    diff = len(contour) - pts
+                    pts -= diff
 
-              if pts >= len(contour):
-                  break
+                if pts >= len(contour):
+                    break
 
-              # pick k points before and after the ith point
-              x = [contour[i][0][0], contour[i-k][0][0], contour[pts][0][0]]
-              y = [contour[i][0][1], contour[i-k][0][1], contour[pts][0][1]]
+                # pick k points before and after the ith point
+                x = [contour[i][0][0], contour[i-k][0][0], contour[pts][0][0]]
+                y = [contour[i][0][1], contour[i-k][0][1], contour[pts][0][1]]
 
-              eq1 = np.array([[1, 0, 0], [1, 1, 1], [1, 2, 4]])
-              x = np.array(x)
-              a = np.linalg.solve(eq1, x)
+                eq1 = np.array([[1, 0, 0], [1, 1, 1], [1, 2, 4]])
+                x = np.array(x)
+                a = np.linalg.solve(eq1, x)
 
-              eq2 = np.array([[1, 0, 0], [1, 1, 1], [1, 2, 4]])
-              y = np.array(y)
-              b = np.linalg.solve(eq2, y)
+                eq2 = np.array([[1, 0, 0], [1, 1, 1], [1, 2, 4]])
+                y = np.array(y)
+                b = np.linalg.solve(eq2, y)
 
-              k_i = 2*(a[1]*b[2]-b[1]*a[2])/(a[1]**2 + b[1]**2) ** 1.5
-              c[i] = k_i
+                k_i = 2*(a[1]*b[2]-b[1]*a[2])/(a[1]**2 + b[1]**2) ** 1.5
+                c[i] = k_i
 
-          return c
+            return c
+
+
+          def localMaxima(contour, curv):
+            lMax_pts = argrelextrema(np.array(curv), np.greater)
+            lMax = contour[lMax_pts]
+            return lMax
 
 
           def create_viz(i):
-          img = cv2.imread(i)
-          h, w = img.shape[:2]
-          filename = i[11:]
+            img = cv2.imread(i)
+            h, w = img.shape[:2]
+            filename = i[11:]
 
-          contours = get_contours(i)
-          local_max = []
+            contours = get_contours(i)
+            local_max = []
 
-          if len(contours) > 1:
-              x = []
-              y = []
-              K = []
+            if len(contours) > 1:
+                x = []
+                y = []
+                K = []
 
-              for cnt in contours:
-                  curv = curvature(contour=cnt)
-                  lmax = argrelextrema(np.array(curv), np.greater)[0]
-                  if lmax.shape[0] != 0:
-                      local_max.append(cnt[lmax[0]])
+                for cnt in contours:
+                    curv = curvature(contour=cnt)
 
-                  cmin = min(curv)
-                  cmax = max(curv)
+                    cmin = min(curv)
+                    cmax = max(curv)
 
-                  # scaling
-                  curv_scaled = [255 * (c-cmin)/(cmax-cmin) for c in curv]
-                  K.extend(curv_scaled)
-                  temp1 = [cnt[i][0][0] for i in range(len(cnt))]
-                  temp2 = [cnt[i][0][1] for i in range(len(cnt))]
-                  x.extend(temp1)
-                  y.extend(temp2)
+                    # scaling
+                    curv_scaled = [255 * (c-cmin)/(cmax-cmin) for c in curv]
 
-              plt.title(filename)
-              imgplt = plt.imshow(img)
-              plt.scatter(x, y, c=K, marker=',', cmap='PuRd')
-              for i in range(len(local_max)):
-                  plt.scatter(x=local_max[0][0][0], y=local_max[0][0][1], marker="^", label='max', c="g")
-              plt.ylim(128, 0)
-              plt.savefig('output/curvature/' + filename)
-              plt.clf()
+                    lMax = localMaxima(cnt, curv)
 
-          elif len(contours) == 1:
-              local_max = []
-              cnt = contours[0]
-              curv = curvature(contour=cnt)
-              cmin = min(curv)
-              cmax = max(curv)
+                    local_max.extend(lMax)
 
-              lmax = argrelextrema(np.array(curv), np.greater)[0]
+                    K.extend(curv_scaled)
+                    temp1 = [cnt[i][0][0] for i in range(len(cnt))]
+                    temp2 = [cnt[i][0][1] for i in range(len(cnt))]
+                    x.extend(temp1)
+                    y.extend(temp2)
 
-              if lmax.shape[0] != 0:
-                  local_max.append(cnt[lmax[0]])
+                plt.title(filename)
+                imgplt = plt.imshow(img)
+                plt.scatter(x, y, c=K, marker=',', cmap='PuRd')
 
-              # scaling
-              K = [255 * (c - cmin) / (cmax - cmin) for c in curv]
-              l = [cnt[i][0][0] for i in range(len(cnt))]
-              m = [cnt[i][0][1] for i in range(len(cnt))]
+                imLMax = img.copy()
+                for i in range(len(local_max)):
+                    # print(local_max[i][0][0], local_max[i][0][1])
+                    imLMax = cv2.circle(imLMax, (local_max[i][0][0], local_max[i][0][1]), 1, (0, 255, 0), -1)
+                    cv2.imwrite('output/maxima'+filename, imLMax)
+                plt.imshow(imLMax)
+                plt.savefig('output/maxima/'+filename)
+                plt.ylim(128, 0)
+                plt.savefig('output/curvature/' + filename)
+                plt.clf()
 
-              plt.title(filename)
-              imgplt = plt.imshow(img)
-              plt.scatter(l, m, c=K, marker=',', cmap='PuRd')
-              for i in range(len(local_max)):
-                  plt.plot(local_max[0][0][0], local_max[0][0][1], marker="^", label='max', c="g")
-              plt.xlim(0, 88)
-              plt.ylim(128, 0)
-              plt.savefig('output/curvature/' + filename)
-              plt.clf()
+            elif len(contours) == 1:
+                cnt = contours[0]
+                curv = curvature(contour=cnt)
+                cmin = min(curv)
+                cmax = max(curv)
+
+                lMax = localMaxima(cnt, curv)
+
+                # scaling
+                K = [255 * (c - cmin) / (cmax - cmin) for c in curv]
+                l = [cnt[i][0][0] for i in range(len(cnt))]
+                m = [cnt[i][0][1] for i in range(len(cnt))]
+
+                plt.title(filename)
+                imgplt = plt.imshow(img)
+                plt.scatter(l, m, c=K, marker=',', cmap='PuRd')
+
+                imLMax = img.copy()
+
+                r = lMax.shape[0]
+
+                for i in range(r):
+                    imLMax = cv2.circle(imLMax, (lMax[i][0][0], lMax[i][0][1]), 1, (0, 255, 0), -1)
+                    cv2.imwrite('output/maxima' + filename, imLMax)
+                plt.imshow(imLMax)
+                plt.savefig('output/maxima/' + filename)
+
+                plt.xlim(0, 88)
+                plt.ylim(128, 0)
+                plt.savefig('output/curvature/' + filename)
+                plt.clf()
 
           if __name__ == '__main__':
-          filenames = [img for img in glob.glob("GaitImages/*.png")]
-          filenames.sort()
+            filenames = [img for img in glob.glob("GaitImages/*.png")]
+            filenames.sort()
 
-          for f in filenames:
-              create_viz(f)
+            for f in filenames:
+                create_viz(f)
     </pre>
 
     <h5> part4.py - Distance Transform </h5>
