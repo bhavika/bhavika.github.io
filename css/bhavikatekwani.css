@@ -1,9 +1,58 @@
-div.social a:link{
-  margin-left: 90px;
-  padding-left: 5px;
-  padding-right: 5px;
+/* 
+  Basic terminal styling: 
+  - black background
+  - green text
+  - monospace font
+  - adjust social icon and image styles for terminal look
+*/
+body {
+  background-color: black;
+  color: lightgreen;
+  font-family: monospace;
+  margin: 0; /* Reset default body margin */
 }
 
-img{
-  margin-left: 330px;
+h1, h2, h3, h4, h5, h6, p, a, li {
+  color: lightgreen; /* Ensure all text elements are green */
+}
+
+a:link, a:visited {
+  color: lightgreen; /* Style links to be green */
+  text-decoration: none; /* Remove underlines from links */
+}
+
+a:hover, a:active {
+  color: green; /* Slightly darker green on hover/active */
+  text-decoration: underline; /* Optional: keep underline on hover if desired */
+}
+
+div.social a:link, div.social a:visited {
+  margin-left: 10px; /* Reduce left margin for social icons */
+  padding: 5px; /* Adjust padding for social icons */
+  border: 1px solid lightgreen; /* Add border around social icons */
+  border-radius: 5px; /* Add slight border radius for icons */
+  display: inline-block; /* Ensure icons are inline but can have padding/border */
+}
+
+div.social a:hover, div.social a:active {
+  background-color: green; /* Darker background on hover for social icons */
+}
+
+img {
+  margin-left: 0; /* Reset image margin */
+  border: 2px solid lightgreen; /* Add border to images */
+  max-width: 100%; /* Ensure images are responsive within terminal style */
+  height: auto; /* Maintain image aspect ratio */
+  display: block; /* Make images behave like blocks */
+  margin-bottom: 10px; /* Add some space below images */
+}
+
+ul {
+  list-style-type: none; /* Remove default list bullets */
+  padding-left: 0; /* Reset padding for lists */
+}
+
+li {
+  padding-left: 0; /* Reset list item padding */
+  margin-bottom: 5px; /* Adjust spacing between list items */
 }
