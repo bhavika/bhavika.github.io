@@ -1,0 +1,9 @@
+title: Bhavika Tekwani
+description: Personal website — software, tech, music
+author: Bhavika Tekwani
+url: https://bhavika.github.io
+baseurl: ""
+
+permalink: /blog/:title/
+
+markdown: kramdown

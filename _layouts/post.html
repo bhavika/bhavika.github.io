@@ -1,0 +1,14 @@
+---
+layout: default
+---
+<h2>{{ page.title }}</h2>
+<p style="color: #999; font-size: 0.9em;">
+  {{ page.date | date: "%B %d, %Y" }}
+  {% if page.tags %}&middot; {{ page.tags | join: ", " }}{% endif %}
+</p>
+
+{{ content }}
+
+<p style="margin-top: 2em;">
+  <a href="{{ site.baseurl }}/blog.html">&larr; all posts</a>
+</p>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  <meta name="author" content="{{ site.author }}">
+
+  <!-- Google Analytics -->
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-68037887-1', 'auto');
+  ga('send', 'pageview');
+  </script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ site.baseurl }}/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="{{ site.baseurl }}/css/normalize.css">
+  <link rel="stylesheet" href="{{ site.baseurl }}/css/skeleton.css">
+  <link rel="stylesheet" href="{{ site.baseurl }}/css/bhavikatekwani.css">
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="sixteen columns" style="margin-top: 40px">
+        <h1><a href="{{ site.baseurl }}/" style="text-decoration: none; color: inherit;">Bhavika Tekwani</a></h1>
+        <h5>Technologist, also human.</h5>
+      </div>
+
+      <div class="one-third column">
+        <ul style="list-style: none;">
+          <li><a href="{{ site.baseurl }}/bio.html">Bio</a></li>
+          <li><a href="{{ site.baseurl }}/blog.html">Blog</a></li>
+        </ul>
+      </div>
+
+      <div class="seven columns">
+        {{ content }}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
